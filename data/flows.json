@@ -2,11 +2,284 @@
  "meta": {
   "version": "1.0",
   "source": "https://farside.co.uk/btc/",
-  "status": "stale",
-  "stale_reason": "G2: no Total column. Actual headers: ['', 'IBIT', 'FBTC', 'BITB', 'ARKB', 'BTCO', 'EZBC', 'BRRR', 'HODL', 'BTCW', 'MSBT', 'GBTC', 'BTC', '']",
-  "stale_since": "2026-07-04T12:10:27Z",
-  "last_fetch_utc": "2026-07-04T12:38:16Z"
+  "last_fetch_utc": "2026-07-04T12:42:11Z",
+  "status": "ok",
+  "stale_reason": null,
+  "stale_since": null
  },
- "days": [],
- "computed": {}
+ "days": [
+  {
+   "date": "2026-06-15",
+   "total_musd": -64.8,
+   "funds": {
+    "IBIT": 66.4,
+    "FBTC": -8.7,
+    "BITB": 0.0,
+    "ARKB": -6.6,
+    "BTCO": 0.0,
+    "EZBC": -5.8,
+    "BRRR": 0.0,
+    "HODL": -6.1,
+    "BTCW": 0.0,
+    "MSBT": 9.4,
+    "GBTC": -124.0,
+    "BTC": 10.6
+   },
+   "provenance": "scraped",
+   "fetched_at": "2026-07-04T12:42:11Z"
+  },
+  {
+   "date": "2026-06-16",
+   "total_musd": 10.2,
+   "funds": {
+    "IBIT": 16.4,
+    "FBTC": 4.3,
+    "BITB": 0.0,
+    "ARKB": 0.0,
+    "BTCO": 0.0,
+    "EZBC": 0.0,
+    "BRRR": 0.0,
+    "HODL": 0.0,
+    "BTCW": 0.0,
+    "MSBT": 1.9,
+    "GBTC": -16.8,
+    "BTC": 4.4
+   },
+   "provenance": "scraped",
+   "fetched_at": "2026-07-04T12:42:11Z"
+  },
+  {
+   "date": "2026-06-17",
+   "total_musd": -82.2,
+   "funds": {
+    "IBIT": -30.8,
+    "FBTC": 14.0,
+    "BITB": 0.0,
+    "ARKB": -43.5,
+    "BTCO": -6.4,
+    "EZBC": 0.0,
+    "BRRR": 0.0,
+    "HODL": -4.1,
+    "BTCW": 0.0,
+    "MSBT": 4.1,
+    "GBTC": -15.5,
+    "BTC": 0.0
+   },
+   "provenance": "scraped",
+   "fetched_at": "2026-07-04T12:42:11Z"
+  },
+  {
+   "date": "2026-06-18",
+   "total_musd": -90.7,
+   "funds": {
+    "IBIT": -96.7,
+    "FBTC": 0.0,
+    "BITB": 0.0,
+    "ARKB": 0.0,
+    "BTCO": 0.0,
+    "EZBC": 0.0,
+    "BRRR": 0.0,
+    "HODL": -4.4,
+    "BTCW": 0.0,
+    "MSBT": 10.4,
+    "GBTC": 0.0,
+    "BTC": 0.0
+   },
+   "provenance": "scraped",
+   "fetched_at": "2026-07-04T12:42:11Z"
+  },
+  {
+   "date": "2026-06-22",
+   "total_musd": -68.3,
+   "funds": {
+    "IBIT": -172.0,
+    "FBTC": 57.4,
+    "BITB": 0.0,
+    "ARKB": 64.0,
+    "BTCO": 0.0,
+    "EZBC": 3.7,
+    "BRRR": 0.0,
+    "HODL": 0.0,
+    "BTCW": 3.4,
+    "MSBT": 8.1,
+    "GBTC": -81.0,
+    "BTC": 48.1
+   },
+   "provenance": "scraped",
+   "fetched_at": "2026-07-04T12:42:11Z"
+  },
+  {
+   "date": "2026-06-23",
+   "total_musd": -113.8,
+   "funds": {
+    "IBIT": -182.0,
+    "FBTC": 23.0,
+    "BITB": 0.0,
+    "ARKB": 31.0,
+    "BTCO": 0.0,
+    "EZBC": 0.0,
+    "BRRR": 0.0,
+    "HODL": 5.3,
+    "BTCW": 0.0,
+    "MSBT": 8.9,
+    "GBTC": 0.0,
+    "BTC": 0.0
+   },
+   "provenance": "scraped",
+   "fetched_at": "2026-07-04T12:42:11Z"
+  },
+  {
+   "date": "2026-06-24",
+   "total_musd": -469.0,
+   "funds": {
+    "IBIT": -239.3,
+    "FBTC": -120.8,
+    "BITB": -27.5,
+    "ARKB": -50.7,
+    "BTCO": 0.0,
+    "EZBC": 0.0,
+    "BRRR": 0.0,
+    "HODL": 0.0,
+    "BTCW": 0.0,
+    "MSBT": 0.0,
+    "GBTC": -54.3,
+    "BTC": 23.6
+   },
+   "provenance": "scraped",
+   "fetched_at": "2026-07-04T12:42:11Z"
+  },
+  {
+   "date": "2026-06-25",
+   "total_musd": -691.7,
+   "funds": {
+    "IBIT": -265.7,
+    "FBTC": -274.5,
+    "BITB": -7.1,
+    "ARKB": -82.1,
+    "BTCO": -53.0,
+    "EZBC": -6.8,
+    "BRRR": 0.0,
+    "HODL": -11.7,
+    "BTCW": 0.0,
+    "MSBT": 9.2,
+    "GBTC": 0.0,
+    "BTC": 0.0
+   },
+   "provenance": "scraped",
+   "fetched_at": "2026-07-04T12:42:11Z"
+  },
+  {
+   "date": "2026-06-26",
+   "total_musd": -444.5,
+   "funds": {
+    "IBIT": -444.5,
+    "FBTC": 0.0,
+    "BITB": 0.0,
+    "ARKB": 0.0,
+    "BTCO": 0.0,
+    "EZBC": 0.0,
+    "BRRR": 0.0,
+    "HODL": 0.0,
+    "BTCW": 0.0,
+    "MSBT": 0.0,
+    "GBTC": 0.0,
+    "BTC": 0.0
+   },
+   "provenance": "scraped",
+   "fetched_at": "2026-07-04T12:42:11Z"
+  },
+  {
+   "date": "2026-06-29",
+   "total_musd": -231.0,
+   "funds": {
+    "IBIT": -300.4,
+    "FBTC": -3.9,
+    "BITB": 0.0,
+    "ARKB": 50.0,
+    "BTCO": 0.0,
+    "EZBC": 0.0,
+    "BRRR": 0.0,
+    "HODL": 3.8,
+    "BTCW": 0.0,
+    "MSBT": 7.3,
+    "GBTC": 35.1,
+    "BTC": -22.9
+   },
+   "provenance": "scraped",
+   "fetched_at": "2026-07-04T12:42:11Z"
+  },
+  {
+   "date": "2026-06-30",
+   "total_musd": -222.6,
+   "funds": {
+    "IBIT": -212.4,
+    "FBTC": -10.2,
+    "BITB": 0.0,
+    "ARKB": 0.0,
+    "BTCO": 0.0,
+    "EZBC": 0.0,
+    "BRRR": 0.0,
+    "HODL": 0.0,
+    "BTCW": 0.0,
+    "MSBT": 0.0,
+    "GBTC": 0.0,
+    "BTC": 0.0
+   },
+   "provenance": "scraped",
+   "fetched_at": "2026-07-04T12:42:11Z"
+  },
+  {
+   "date": "2026-07-01",
+   "total_musd": -296.0,
+   "funds": {
+    "IBIT": -219.4,
+    "FBTC": -51.0,
+    "BITB": 0.0,
+    "ARKB": -39.9,
+    "BTCO": 5.4,
+    "EZBC": 3.5,
+    "BRRR": 0.0,
+    "HODL": 2.1,
+    "BTCW": 0.0,
+    "MSBT": 29.8,
+    "GBTC": -62.8,
+    "BTC": 36.3
+   },
+   "provenance": "scraped",
+   "fetched_at": "2026-07-04T12:42:11Z"
+  },
+  {
+   "date": "2026-07-02",
+   "total_musd": 223.5,
+   "funds": {
+    "IBIT": -40.4,
+    "FBTC": 166.0,
+    "BITB": 0.0,
+    "ARKB": 91.8,
+    "BTCO": 0.0,
+    "EZBC": 0.0,
+    "BRRR": 1.7,
+    "HODL": 4.4,
+    "BTCW": 0.0,
+    "MSBT": 0.0,
+    "GBTC": 0.0,
+    "BTC": 0.0
+   },
+   "provenance": "scraped",
+   "fetched_at": "2026-07-04T12:42:11Z"
+  }
+ ],
+ "computed": {
+  "rolling_window_days": 90,
+  "window_actual_days": 13,
+  "insufficient_window": true,
+  "mu_musd": -195.5,
+  "sigma_musd": 228.2,
+  "latest_z": 1.84,
+  "streak": {
+   "direction": "inflow",
+   "days": 1
+  },
+  "cumulative_since_start_musd": -2540.9
+ }
 }
