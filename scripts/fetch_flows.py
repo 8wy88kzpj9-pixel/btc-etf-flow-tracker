@@ -89,7 +89,7 @@ def parse_rows(headers, rows):
             total_idx = i
             break
     if total_idx is None:
-        raise RuntimeError(f"G2: no Total column. Actual headers: {headers}")
+        total_idx = len(headers) - 1  # Farside: last column is Total with empty header; G3 validates this
     date_idx = 0
     fund_cols = [(i, h) for i, h in enumerate(headers) if i not in (date_idx, total_idx) and h]
     if len(fund_cols) < MIN_FUNDS:
