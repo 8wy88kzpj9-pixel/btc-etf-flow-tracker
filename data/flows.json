@@ -3,9 +3,9 @@
   "version": "1.0",
   "source": "https://farside.co.uk/btc/",
   "status": "stale",
-  "stale_reason": "G1: HTTP 403",
+  "stale_reason": "G2: only 0 fund columns parsed",
   "stale_since": "2026-07-04T12:10:27Z",
-  "last_fetch_utc": "2026-07-04T12:10:27Z"
+  "last_fetch_utc": "2026-07-04T12:30:40Z"
  },
  "days": [],
  "computed": {}
