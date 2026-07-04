@@ -1,0 +1,32 @@
+name: Update BTC ETF flows
+
+on:
+  schedule:
+    - cron: "30 21 * * 2-6"   # 21:30 UTC Tue-Sat = after Mon-Fri US close
+  workflow_dispatch:           # manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install requests beautifulsoup4
+
+      - name: Fetch and validate flows
+        run: python scripts/fetch_flows.py
+
+      - name: Commit if changed
+        run: |
+          git config user.name "flow-bot"
+          git config user.email "actions@github.com"
+          git add data/flows.json
+          git diff --cached --quiet || git commit -m "flows: $(date -u +%Y-%m-%d)"
+          git push
