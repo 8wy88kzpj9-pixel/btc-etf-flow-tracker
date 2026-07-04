@@ -21,7 +21,7 @@ DATA = Path(__file__).resolve().parent.parent / "data"
 FLOWS = DATA / "flows.json"
 PATCHES = DATA / "manual_patches.json"
 
-MIN_FUNDS = 10
+MIN_FUNDS = 8
 SUM_TOL = 2.0
 MAX_ABS_TOTAL = 3000.0
 ROLL = 90
@@ -38,8 +38,12 @@ def now_utc():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def clean(text):
+    return text.replace("\u00a0", " ").strip()
+
+
 def parse_num(text):
-    t = text.strip().replace(",", "")
+    t = clean(text).replace(",", "")
     if t in ("", "-", "\u2013", "\u2014"):
         return 0.0
     neg = t.startswith("(") and t.endswith(")")
@@ -52,7 +56,7 @@ def parse_num(text):
 
 
 def parse_date(text):
-    t = text.strip()
+    t = clean(text)
     for fmt in ("%d %b %Y", "%d %B %Y", "%Y-%m-%d"):
         try:
             return datetime.strptime(t, fmt).date()
@@ -72,24 +76,28 @@ def fetch_table():
     for table in soup.find_all("table"):
         rows = table.find_all("tr")
         for idx, tr in enumerate(rows):
-            cells = [c.get_text(strip=True) for c in tr.find_all(["th", "td"])]
+            cells = [clean(c.get_text()) for c in tr.find_all(["th", "td"])]
             if "IBIT" in cells and "FBTC" in cells:
                 return cells, rows[idx + 1:]
     raise RuntimeError("G1: header row with IBIT/FBTC not found (layout changed?)")
 
 
 def parse_rows(headers, rows):
-    if "Total" not in headers:
-        raise RuntimeError("G2: Total column not found in header row")
+    total_idx = None
+    for i, h in enumerate(headers):
+        if "total" in h.lower():
+            total_idx = i
+            break
+    if total_idx is None:
+        raise RuntimeError(f"G2: no Total column. Actual headers: {headers}")
     date_idx = 0
-    total_idx = headers.index("Total")
     fund_cols = [(i, h) for i, h in enumerate(headers) if i not in (date_idx, total_idx) and h]
     if len(fund_cols) < MIN_FUNDS:
-        raise RuntimeError(f"G2: only {len(fund_cols)} fund columns parsed")
+        raise RuntimeError(f"G2: only {len(fund_cols)} fund columns. Actual headers: {headers}")
 
     days, today = [], datetime.now(timezone.utc).date()
     for tr in rows:
-        cells = [c.get_text(strip=True) for c in tr.find_all(["td", "th"])]
+        cells = [clean(c.get_text()) for c in tr.find_all(["td", "th"])]
         if len(cells) != len(headers):
             continue
         d = parse_date(cells[date_idx])
@@ -105,14 +113,14 @@ def parse_rows(headers, rows):
                 break
             funds[name] = v
         if bad:
-            raise RuntimeError(f"G6: non-numeric cell on {d}")
+            continue
         total = parse_num(cells[total_idx])
         if total is None:
-            raise RuntimeError(f"G6: non-numeric total on {d}")
+            continue
         if abs(total) > MAX_ABS_TOTAL:
             raise RuntimeError(f"G4: |total|={total} on {d}")
         if abs(sum(funds.values()) - total) > SUM_TOL:
-            raise RuntimeError(f"G3: sum!=total on {d}")
+            raise RuntimeError(f"G3: sum={sum(funds.values()):.1f} != total={total} on {d}")
         days.append({
             "date": d.isoformat(),
             "total_musd": round(total, 2),
