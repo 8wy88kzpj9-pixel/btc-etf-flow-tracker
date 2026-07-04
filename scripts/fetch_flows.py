@@ -70,17 +70,17 @@ def fetch_table():
         raise RuntimeError(f"G1: HTTP {r.status_code}")
     soup = BeautifulSoup(r.text, "html.parser")
     for table in soup.find_all("table"):
-        header_row = table.find("tr")
-        if not header_row:
-            continue
-        headers = [c.get_text(strip=True) for c in header_row.find_all(["th", "td"])]
-        if "Total" in headers and len(headers) >= MIN_FUNDS + 2:
-            rows = table.find_all("tr")[1:]
-            return headers, rows
-    raise RuntimeError("G1: flow table not found in DOM (layout changed?)")
+        rows = table.find_all("tr")
+        for idx, tr in enumerate(rows):
+            cells = [c.get_text(strip=True) for c in tr.find_all(["th", "td"])]
+            if "IBIT" in cells and "FBTC" in cells:
+                return cells, rows[idx + 1:]
+    raise RuntimeError("G1: header row with IBIT/FBTC not found (layout changed?)")
 
 
 def parse_rows(headers, rows):
+    if "Total" not in headers:
+        raise RuntimeError("G2: Total column not found in header row")
     date_idx = 0
     total_idx = headers.index("Total")
     fund_cols = [(i, h) for i, h in enumerate(headers) if i not in (date_idx, total_idx) and h]
