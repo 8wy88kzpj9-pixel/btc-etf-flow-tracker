@@ -4,7 +4,7 @@
 import argparse
 import json
 import sys
-from datetime import datetime, timezone, date
+from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
@@ -20,7 +20,12 @@ SUM_TOL = 2.0
 MAX_ABS_TOTAL = 3000.0
 ROLL = 90
 
-UA = {"User-Agent": "Mozilla/5.0 (compatible; flow-tracker/1.0; personal research)"}
+UA = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://farside.co.uk/",
+}
 
 
 def now_utc():
