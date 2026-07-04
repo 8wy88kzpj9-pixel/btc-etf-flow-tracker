@@ -2,8 +2,8 @@ name: Update BTC ETF flows
 
 on:
   schedule:
-    - cron: "30 21 * * 2-6"   # 21:30 UTC Tue-Sat = after Mon-Fri US close
-  workflow_dispatch:           # manual trigger
+    - cron: "30 21 * * 2-6"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - run: pip install requests beautifulsoup4
+      - run: pip install requests beautifulsoup4 cloudscraper
 
       - name: Fetch and validate flows
         run: python scripts/fetch_flows.py
@@ -29,4 +29,5 @@ jobs:
           git config user.email "actions@github.com"
           git add data/flows.json
           git diff --cached --quiet || git commit -m "flows: $(date -u +%Y-%m-%d)"
+          git pull --rebase origin main
           git push
