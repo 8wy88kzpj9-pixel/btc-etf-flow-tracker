@@ -1,0 +1,12 @@
+{
+ "meta": {
+  "version": "1.0",
+  "source": "https://farside.co.uk/btc/",
+  "status": "stale",
+  "stale_reason": "G1: HTTP 403",
+  "stale_since": "2026-07-04T12:10:27Z",
+  "last_fetch_utc": "2026-07-04T12:10:27Z"
+ },
+ "days": [],
+ "computed": {}
+}
