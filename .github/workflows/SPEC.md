@@ -105,3 +105,4 @@ GitHub Pages
 1. **Farside layout change = ความเสี่ยงหลัก** — scraper เขียน defensive (หา table จาก header names ไม่ใช่ position) แต่พังได้เสมอ → fallback คือ manual patch, ระบบไม่หยุดทำงาน
 2. **Selector ยังไม่ verified กับ live HTML** — container นี้ไม่มี network; ก่อน deploy จริงต้องรัน `fetch_flows.py --dry-run` ใน Actions หนึ่งรอบแล้วดู log ว่า parse ถูก **ห้ามเชื่อ code จนกว่าจะเห็น output จริง** (sourced-or-null ใช้กับ code ด้วย)
 3. Farside vs SoSoValue ต่างกันเล็กน้อยจาก T+1 settlement — Farside คือ canonical แล้ว ไม่ cross-check อัตโนมัติ ไม่สลับเจ้า
+<!-- pages redeploy 2026-07-05 -->
