@@ -7,8 +7,14 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-import requests
 from bs4 import BeautifulSoup
+
+try:
+    import cloudscraper
+    HTTP = cloudscraper.create_scraper()
+except ImportError:
+    import requests
+    HTTP = requests.Session()
 
 URL = "https://farside.co.uk/btc/"
 DATA = Path(__file__).resolve().parent.parent / "data"
@@ -57,8 +63,8 @@ def parse_date(text):
 
 def fetch_table():
     try:
-        r = requests.get(URL, headers=UA, timeout=30)
-    except requests.RequestException as e:
+        r = HTTP.get(URL, headers=UA, timeout=30)
+    except Exception as e:
         raise RuntimeError(f"G1: fetch failed: {e}")
     if r.status_code != 200:
         raise RuntimeError(f"G1: HTTP {r.status_code}")
