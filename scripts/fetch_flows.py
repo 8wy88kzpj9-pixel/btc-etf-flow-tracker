@@ -16,7 +16,7 @@ except ImportError:
     import requests
     HTTP = requests.Session()
 
-URL = "https://farside.co.uk/btc/"
+URL = URL = "https://farside.co.uk/bitcoin-etf-flow-all-data/"
 DATA = Path(__file__).resolve().parent.parent / "data"
 FLOWS = DATA / "flows.json"
 PATCHES = DATA / "manual_patches.json"
