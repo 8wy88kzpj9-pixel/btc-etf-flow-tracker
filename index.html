@@ -10,14 +10,29 @@ body{font-family:-apple-system,system-ui,sans-serif;background:#0d1117;color:#e6
 h1{font-size:18px;margin:0 0 4px}
 .sub{color:#8b949e;font-size:12px;margin-bottom:12px}
 .banner{background:#da3633;color:#fff;padding:10px 14px;border-radius:8px;font-weight:600;margin-bottom:12px;display:none}
-.cards{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:10px 14px;min-width:100px}
+.cards{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:10px 14px;min-width:100px;flex:1}
 .card .k{font-size:11px;color:#8b949e}
 .card .v{font-size:20px;font-weight:700;margin-top:2px}
 .pos{color:#3fb950}.neg{color:#f85149}
+.ranges{display:flex;gap:6px;margin-bottom:10px}
+.ranges button{flex:1;background:#161b22;border:1px solid #30363d;color:#8b949e;border-radius:8px;padding:8px 0;font-size:13px;font-weight:600}
+.ranges button.on{background:#1f6feb;border-color:#1f6feb;color:#fff}
 .chartbox{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:10px;margin-bottom:14px}
-canvas{max-height:340px}
+.fw{position:relative;height:380px}
+.cw{position:relative;height:300px}
 .note{color:#8b949e;font-size:11px}
+.hint{display:none}
+/* LANDSCAPE: chart-first mode */
+@media (orientation:landscape){
+  body{padding:8px}
+  h1,.sub,.cards,.note{display:none}
+  .ranges{margin-bottom:6px}
+  .ranges button{padding:5px 0;font-size:12px}
+  .fw{height:82vh}
+  .cw{height:82vh}
+  .hint{display:block;color:#8b949e;font-size:10px;text-align:center;margin:4px 0}
+}
 </style>
 </head>
 <body>
@@ -30,12 +45,82 @@ canvas{max-height:340px}
   <div class="card"><div class="k">Z-score (90d)</div><div class="v" id="z">–</div></div>
   <div class="card"><div class="k">IBIT latest</div><div class="v" id="ibit">–</div></div>
 </div>
-<div class="chartbox"><canvas id="flowChart"></canvas></div>
-<div class="chartbox"><canvas id="cumChart"></canvas></div>
-<p class="note">Source: farside.co.uk · US$ millions · bands = rolling 90d ±2σ (fat-tailed: read as relative extremeness, not probability) · manual-patch rows excluded from none</p>
+<div class="ranges" id="ranges">
+  <button data-d="90">90D</button>
+  <button data-d="120" class="on">120D</button>
+  <button data-d="365">1Y</button>
+  <button data-d="0">ALL</button>
+</div>
+<div class="hint">หมุนกลับเป็นแนวตั้งเพื่อดูการ์ด streak / z-score / IBIT</div>
+<div class="chartbox"><div class="fw"><canvas id="flowChart"></canvas></div></div>
+<div class="chartbox"><div class="cw"><canvas id="cumChart"></canvas></div></div>
+<p class="note">Source: farside.co.uk · US$ millions · bands = rolling 90d ±2σ (fat-tailed: relative extremeness, not probability)</p>
 <script>
 const ROLL=90;
+let ALLDATA=null,flowChart=null,cumChart=null,curRange=120;
+
+function render(rangeDays){
+  curRange=rangeDays;
+  const allDays=ALLDATA.days;
+  const days=rangeDays>0?allDays.slice(-rangeDays):allDays;
+  const labels=days.map(d=>d.date);
+  const vals=days.map(d=>d.total_musd);
+
+  // bands from FULL history, then sliced — left edge stays correct
+  const all=allDays.map(d=>d.total_musd);
+  const muA=[],upA=[],loA=[];
+  for(let i=0;i<all.length;i++){
+    const w=all.slice(Math.max(0,i-ROLL+1),i+1);
+    const mean=w.reduce((a,b)=>a+b,0)/w.length;
+    const sd=w.length>1?Math.sqrt(w.reduce((a,b)=>a+(b-mean)**2,0)/w.length):0;
+    muA.push(mean);upA.push(mean+2*sd);loA.push(mean-2*sd);
+  }
+  const off=allDays.length-days.length;
+  const mu=muA.slice(off),up=upA.slice(off),lo=loA.slice(off);
+  let s=0;const cumA=all.map(v=>+(s+=v).toFixed(1));
+  const cum=cumA.slice(off);
+
+  const many=days.length>200;
+  if(flowChart)flowChart.destroy();
+  if(cumChart)cumChart.destroy();
+
+  flowChart=new Chart(document.getElementById('flowChart'),{
+    data:{labels,datasets:[
+      {type:'bar',label:'Daily net flow ($M)',data:vals,
+       backgroundColor:vals.map(v=>v>=0?'rgba(63,185,80,.85)':'rgba(248,81,73,.85)'),
+       barPercentage:1,categoryPercentage:many?1:.9},
+      {type:'line',label:'+2σ',data:up,borderColor:'rgba(139,148,158,.9)',borderWidth:1.5,borderDash:[5,4],pointRadius:0},
+      {type:'line',label:'mean',data:mu,borderColor:'rgba(139,148,158,.5)',borderWidth:1,pointRadius:0},
+      {type:'line',label:'-2σ',data:lo,borderColor:'rgba(139,148,158,.9)',borderWidth:1.5,borderDash:[5,4],pointRadius:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,animation:many?false:undefined,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#8b949e',boxWidth:12,font:{size:10}}}},
+      scales:{x:{ticks:{color:'#8b949e',maxTicksLimit:8,maxRotation:0}},
+              y:{ticks:{color:'#8b949e'},grid:{color:'#21262d'}}}}
+  });
+  cumChart=new Chart(document.getElementById('cumChart'),{
+    type:'line',
+    data:{labels,datasets:[{label:'Cumulative net flow ($M)',data:cum,
+      borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,.15)',fill:true,pointRadius:0,borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,animation:many?false:undefined,
+      plugins:{legend:{labels:{color:'#8b949e',font:{size:10}}}},
+      scales:{x:{ticks:{color:'#8b949e',maxTicksLimit:8,maxRotation:0}},
+              y:{ticks:{color:'#8b949e'},grid:{color:'#21262d'}}}}
+  });
+}
+
+document.getElementById('ranges').addEventListener('click',e=>{
+  if(e.target.tagName!=='BUTTON')return;
+  document.querySelectorAll('.ranges button').forEach(b=>b.classList.remove('on'));
+  e.target.classList.add('on');
+  render(+e.target.dataset.d);
+});
+// re-render on rotate so canvas fills the new box
+window.addEventListener('orientationchange',()=>setTimeout(()=>{if(ALLDATA)render(curRange);},300));
+
 fetch('data/flows.json?'+Date.now()).then(r=>r.json()).then(j=>{
+  ALLDATA=j;
   const m=j.meta||{};
   document.getElementById('meta').textContent=
     'last fetch: '+(m.last_fetch_utc||'?')+' · status: '+(m.status||'?');
@@ -46,49 +131,16 @@ fetch('data/flows.json?'+Date.now()).then(r=>r.json()).then(j=>{
   }
   const days=j.days||[];
   if(!days.length)return;
-  const labels=days.map(d=>d.date);
-  const vals=days.map(d=>d.total_musd);
-
-  // rolling mean & sigma per point
-  const mu=[],up=[],lo=[];
-  for(let i=0;i<vals.length;i++){
-    const w=vals.slice(Math.max(0,i-ROLL+1),i+1);
-    const mean=w.reduce((a,b)=>a+b,0)/w.length;
-    const sd=w.length>1?Math.sqrt(w.reduce((a,b)=>a+(b-mean)**2,0)/w.length):0;
-    mu.push(mean);up.push(mean+2*sd);lo.push(mean-2*sd);
-  }
-  // cumulative
-  let s=0;const cum=vals.map(v=>+(s+=v).toFixed(1));
-
   const c=j.computed||{};
   const last=days[days.length-1];
   const el=(id,txt,cls)=>{const e=document.getElementById(id);e.textContent=txt;if(cls)e.className='v '+cls;};
   el('latest',(last.total_musd>0?'+':'')+last.total_musd+'M',last.total_musd>=0?'pos':'neg');
   const st=c.streak||{};
-  el('streak',(st.direction==='inflow'?'▲ ':'▼ ')+(st.days||0)+'d '+(st.direction||''),st.direction==='inflow'?'pos':'neg');
-  el('z',(c.latest_z>0?'+':'')+(c.latest_z??'–')+(c.insufficient_window?' ⚠︎':''),c.latest_z>=0?'pos':'neg');
+  el('streak',(st.direction==='inflow'?'▲ ':'▼ ')+(st.days||0)+'d',st.direction==='inflow'?'pos':'neg');
+  el('z',(c.latest_z>0?'+':'')+(c.latest_z??'–'),c.latest_z>=0?'pos':'neg');
   const ib=(last.funds||{}).IBIT;
   el('ibit',ib===undefined?'n/a':((ib>0?'+':'')+ib+'M'),ib>=0?'pos':'neg');
-
-  new Chart(document.getElementById('flowChart'),{
-    data:{labels,datasets:[
-      {type:'bar',label:'Daily net flow ($M)',data:vals,
-       backgroundColor:vals.map(v=>v>=0?'rgba(63,185,80,.75)':'rgba(248,81,73,.75)')},
-      {type:'line',label:'+2σ',data:up,borderColor:'rgba(139,148,158,.8)',borderWidth:1,borderDash:[5,4],pointRadius:0},
-      {type:'line',label:'mean (90d)',data:mu,borderColor:'rgba(139,148,158,.5)',borderWidth:1,pointRadius:0},
-      {type:'line',label:'-2σ',data:lo,borderColor:'rgba(139,148,158,.8)',borderWidth:1,borderDash:[5,4],pointRadius:0}
-    ]},
-    options:{responsive:true,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{labels:{color:'#8b949e',boxWidth:12,font:{size:10}}}},
-      scales:{x:{ticks:{color:'#8b949e',maxTicksLimit:8}},y:{ticks:{color:'#8b949e'},grid:{color:'#21262d'}}}}
-  });
-  new Chart(document.getElementById('cumChart'),{
-    type:'line',
-    data:{labels,datasets:[{label:'Cumulative net flow ($M)',data:cum,
-      borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,.15)',fill:true,pointRadius:0,borderWidth:2}]},
-    options:{responsive:true,plugins:{legend:{labels:{color:'#8b949e',font:{size:10}}}},
-      scales:{x:{ticks:{color:'#8b949e',maxTicksLimit:8}},y:{ticks:{color:'#8b949e'},grid:{color:'#21262d'}}}}
-  });
+  render(120);
 }).catch(e=>{
   const b=document.getElementById('staleBanner');
   b.style.display='block';b.textContent='Cannot load data/flows.json — '+e;
