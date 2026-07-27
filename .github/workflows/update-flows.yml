@@ -27,7 +27,26 @@ jobs:
         run: |
           git config user.name "flow-bot"
           git config user.email "actions@github.com"
-          git add data/flows.json
+          git add data/flows.json data/summary.json
           git diff --cached --quiet || git commit -m "flows: $(date -u +%Y-%m-%d)"
           git pull --rebase origin main
           git push
+
+      # เตือนดังๆ ถ้า scrape พงแบบเงียบ หรือข้อมูลค้างเกิน 5 วัน
+      # (สคริปต์ออกแบบให้ exit 0 ตอน stale เพื่อไม่ทับไฟล์ดี — ด่านนี้จึงเป็นตัวส่งเสียง)
+      - name: Freshness alarm
+        run: |
+          python - <<'PY'
+          import json, sys
+          from datetime import datetime, timezone
+          s = json.load(open("data/summary.json"))
+          age = s.get("staleness_days")
+          print(f"status={s.get('status')} asof={s.get('asof')} age={age}d "
+                f"streak={s.get('streak_direction')}/{s.get('streak_days')} z90={s.get('z90')}")
+          if s.get("status") != "ok":
+              print(f"::error::SCRAPE STALE — {s.get('stale_reason')}")
+              sys.exit(1)
+          if age is not None and age > 5:
+              print(f"::error::DATA STALE — newest bar {age} days old")
+              sys.exit(1)
+          PY
