@@ -1,5 +1,19 @@
 #!/usr/bin/env python3
-"""BTC ETF Flow Tracker - Farside scraper. sourced-or-null: fail gate -> stale, never overwrite."""
+"""BTC ETF Flow Tracker - Farside scraper. sourced-or-null: fail gate -> stale, never overwrite.
+
+v1.1 (2026-07-26): adds data/summary.json — a small, fixed-size digest of the
+LATEST state only, so downstream readers never have to pull the full ~640-day
+flows.json (which exceeds fetch limits and truncates before reaching today).
+
+SERIES SEPARATION (deliberate, do not "simplify"):
+  This file produces US SPOT ETF flows from farside — daily, US-listed wrappers
+  only. It is NOT the same population as the EPFR "crypto funds" line in the
+  BofA Flow Show (global funds, weekly). The two are cross-checks of each other,
+  never inputs to one another. Every key written here is namespaced under
+  "btc_etf_us" so it can never be merged into a Hartnett flows.* field by
+  accident. Agreement between the two lenses is evidence; divergence is also
+  evidence (e.g. EPFR positive + US ETF flat = the inflow is non-US money).
+"""
 
 import argparse
 import json
@@ -16,9 +30,10 @@ except ImportError:
     import requests
     HTTP = requests.Session()
 
-URL = URL = "https://farside.co.uk/bitcoin-etf-flow-all-data/"
+URL = "https://farside.co.uk/bitcoin-etf-flow-all-data/"
 DATA = Path(__file__).resolve().parent.parent / "data"
 FLOWS = DATA / "flows.json"
+SUMMARY = DATA / "summary.json"
 PATCHES = DATA / "manual_patches.json"
 
 MIN_FUNDS = 8
@@ -190,6 +205,54 @@ def compute(days):
     }
 
 
+def build_summary(meta, days, computed):
+    """Fixed-size digest of the latest state. Fully namespaced: every value here
+    describes US-listed spot ETF flows only. Never merge into an EPFR field."""
+    if not days:
+        return None
+    last = days[-1]
+    vals = [d["total_musd"] for d in days]
+    stale_days = None
+    try:
+        asof = datetime.strptime(last["date"], "%Y-%m-%d").date()
+        stale_days = (datetime.now(timezone.utc).date() - asof).days
+    except ValueError:
+        pass
+    streak = computed.get("streak", {})
+    return {
+        "series_id": "btc_etf_us",
+        "series_note": (
+            "US-listed BTC spot ETF net flows (farside), daily, $mn. NOT EPFR "
+            "crypto-fund flows from the BofA Flow Show (global, weekly) — use as "
+            "an independent cross-check, never as a substitute or a sum."
+        ),
+        "asof": last["date"],
+        "staleness_days": stale_days,
+        "status": meta.get("status"),
+        "stale_reason": meta.get("stale_reason"),
+        "last_fetch_utc": meta.get("last_fetch_utc"),
+        "latest_musd": last["total_musd"],
+        "ibit_musd": last["funds"].get("IBIT"),
+        "streak_direction": streak.get("direction"),
+        "streak_days": streak.get("days"),
+        "z90": computed.get("latest_z"),
+        "insufficient_window": computed.get("insufficient_window"),
+        "sum_5d_musd": round(sum(vals[-5:]), 1),
+        "sum_20d_musd": round(sum(vals[-20:]), 1),
+        "days_positive_last_20": sum(1 for v in vals[-20:] if v > 0),
+        "rows_total": len(days),
+    }
+
+
+def write_summary(meta, days, computed):
+    s = build_summary(meta, days, computed)
+    if s is None:
+        return
+    SUMMARY.parent.mkdir(parents=True, exist_ok=True)
+    with open(SUMMARY, "w") as f:
+        json.dump(s, f, indent=1)
+
+
 def write_stale(existing, reason):
     existing.setdefault("meta", {})
     existing["meta"].update({
@@ -201,6 +264,8 @@ def write_stale(existing, reason):
     FLOWS.parent.mkdir(parents=True, exist_ok=True)
     with open(FLOWS, "w") as f:
         json.dump(existing, f, indent=1)
+    # keep summary in lockstep so a stale scrape can never look fresh downstream
+    write_summary(existing["meta"], existing.get("days", []), existing.get("computed", {}))
     print(f"STALE: {reason}")
 
 
@@ -225,7 +290,7 @@ def main():
     days = merge(existing["days"], scraped, patches)
     out = {
         "meta": {
-            "version": "1.0",
+            "version": "1.1",
             "source": URL,
             "last_fetch_utc": now_utc(),
             "status": "ok",
@@ -237,13 +302,20 @@ def main():
     }
 
     if args.dry_run:
-        print(json.dumps({"meta": out["meta"], "computed": out["computed"], "last_5_days": days[-5:]}, indent=1))
+        print(json.dumps({
+            "meta": out["meta"],
+            "computed": out["computed"],
+            "summary_preview": build_summary(out["meta"], days, out["computed"]),
+            "last_5_days": days[-5:],
+        }, indent=1))
         return
 
     FLOWS.parent.mkdir(parents=True, exist_ok=True)
     with open(FLOWS, "w") as f:
         json.dump(out, f, indent=1)
+    write_summary(out["meta"], days, out["computed"])
     print(f"OK: {len(days)} days, latest {days[-1]['date']} total={days[-1]['total_musd']}M, streak={out['computed']['streak']}")
+    print(f"summary.json written: asof={days[-1]['date']} z90={out['computed'].get('latest_z')}")
 
 
 if __name__ == "__main__":
