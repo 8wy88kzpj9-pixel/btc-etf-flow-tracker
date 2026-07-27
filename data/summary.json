@@ -5,7 +5,7 @@
  "staleness_days": 3,
  "status": "ok",
  "stale_reason": null,
- "last_fetch_utc": "2026-07-27T01:20:25Z",
+ "last_fetch_utc": "2026-07-27T01:20:52Z",
  "latest_musd": -240.1,
  "ibit_musd": -212.2,
  "streak_direction": "outflow",
