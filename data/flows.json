@@ -2,10 +2,10 @@
  "meta": {
   "version": "1.1",
   "source": "https://farside.co.uk/bitcoin-etf-flow-all-data/",
-  "last_fetch_utc": "2026-07-29T07:51:42Z",
-  "status": "ok",
-  "stale_reason": null,
-  "stale_since": null
+  "last_fetch_utc": "2026-07-30T06:46:32Z",
+  "status": "stale",
+  "stale_reason": "G1: fetch failed: HTTPSConnectionPool(host='farside.co.uk', port=443): Read timed out. (read timeout=30)",
+  "stale_since": "2026-07-30T06:46:32Z"
  },
  "days": [
   {
