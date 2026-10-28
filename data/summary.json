@@ -1,19 +1,19 @@
 {
  "series_id": "btc_etf_us",
  "series_note": "US-listed BTC spot ETF net flows (farside), daily, $mn. NOT EPFR crypto-fund flows from the BofA Flow Show (global, weekly) \u2014 use as an independent cross-check, never as a substitute or a sum.",
- "asof": "2026-10-23",
+ "asof": "2026-10-27",
  "staleness_days": 1,
  "status": "ok",
  "stale_reason": null,
- "last_fetch_utc": "2026-10-24T23:31:02Z",
- "latest_musd": -137.9,
- "ibit_musd": -110.3,
- "streak_direction": "outflow",
+ "last_fetch_utc": "2026-10-28T00:38:39Z",
+ "latest_musd": 24.5,
+ "ibit_musd": 0.0,
+ "streak_direction": "inflow",
  "streak_days": 2,
- "z90": -0.61,
+ "z90": -0.07,
  "insufficient_window": false,
- "sum_5d_musd": 301.2,
- "sum_20d_musd": -365.0,
+ "sum_5d_musd": -113.9,
+ "sum_20d_musd": -327.4,
  "days_positive_last_20": 11,
- "rows_total": 715
+ "rows_total": 717
 }
