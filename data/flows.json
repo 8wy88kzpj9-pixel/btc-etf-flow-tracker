@@ -2,7 +2,7 @@
  "meta": {
   "version": "1.1",
   "source": "https://farside.co.uk/bitcoin-etf-flow-all-data/",
-  "last_fetch_utc": "2026-11-13T02:00:15Z",
+  "last_fetch_utc": "2026-11-14T01:33:11Z",
   "status": "stale",
   "stale_reason": "G1: HTTP 403",
   "stale_since": "2026-11-13T02:00:15Z"
